@@ -3,12 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
-import plotly.graph_objects as go
 
-def plot_solution(model, nx=256, nt=100):
+def plot_solution(model, nx=256, nt=100, filename=None):
     model.eval()
-    t = torch.linspace(0, 1, nt)
-    x = torch.linspace(-1, 1, nx)
+    device = next(model.parameters()).device
+    t = torch.linspace(0, 1, nt, device=device)
+    x = torch.linspace(-1, 1, nx, device=device)
     T, X = torch.meshgrid(t, x, indexing='ij')
     with torch.no_grad():
         U = model(
@@ -28,6 +28,38 @@ def plot_solution(model, nx=256, nt=100):
     plt.xlabel('t')
     plt.ylabel('x')
     plt.title('PINN Solution')
+    if filename:
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        print(f"Figure saved as {filename}")
+    plt.show()
+
+def plot_solution_3d(model, nx=256, nt=100, filename=None):
+    model.eval()
+    device = next(model.parameters()).device
+    t = torch.linspace(0, 1, nt, device=device)
+    x = torch.linspace(-1, 1, nx, device=device)
+    T, X = torch.meshgrid(t, x, indexing='ij')
+    with torch.no_grad():
+        U = model(
+            T.reshape(-1,1),
+            X.reshape(-1,1)
+        )
+    U = U.reshape(nt, nx).cpu().numpy()
+    T_np = T.cpu().numpy()
+    X_np = X.cpu().numpy()
+    
+    fig = plt.figure(figsize=(10,7))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_xlabel('t')
+    ax.set_ylabel('x')
+    ax.set_zlabel('u(t, x)')
+    ax.set_title('PINN Solution (3D Surface)')
+    surf = ax.plot_surface(T_np, X_np, U, cmap='jet', edgecolor='none')
+    fig.colorbar(surf, label='u(t,x)')
+    
+    if filename:
+        plt.savefig(filename, dpi=300, bbox_inches='tight')
+        print(f"3D Figure saved as {filename}")
     plt.show()
 
 def plot_1d_heatmap(U, title="1D Heat Equation - PINN", filename="spatiotemporal_heatmap.png"):
