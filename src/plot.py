@@ -3,6 +3,32 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
+import plotly.graph_objects as go
+
+def plot_solution(model, nx=256, nt=100):
+    model.eval()
+    t = torch.linspace(0, 1, nt)
+    x = torch.linspace(-1, 1, nx)
+    T, X = torch.meshgrid(t, x, indexing='ij')
+    with torch.no_grad():
+        U = model(
+            T.reshape(-1,1),
+            X.reshape(-1,1)
+        )
+    U = U.reshape(nt, nx).cpu().numpy()
+    plt.figure(figsize=(10,6))
+    plt.imshow(
+        U.T,
+        extent=[0,1,-1,1],
+        origin='lower',
+        aspect='auto',
+        cmap='jet'
+    )
+    plt.colorbar(label='u(t,x)')
+    plt.xlabel('t')
+    plt.ylabel('x')
+    plt.title('PINN Solution')
+    plt.show()
 
 def plot_1d_heatmap(U, title="1D Heat Equation - PINN", filename="spatiotemporal_heatmap.png"):
     plt.figure(figsize=(10,6))
@@ -62,7 +88,6 @@ def plot_2d_comparison(X_np, Y_np, U_pred, U_exact, t_val, filename="comparison.
     plt.show()
 
 def plot_2d_interactive(U_pred, x_val, y_val, t_val):
-    import plotly.graph_objects as go
     fig = go.Figure(data=[go.Surface(
         z=U_pred, 
         x=x_val, 

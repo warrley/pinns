@@ -7,7 +7,7 @@ Este diretório contém os experimentos para a resolução da **Equação do Cal
 A Equação do Calor em 1D descreve a distribuição de calor em uma região ao longo do tempo. A forma geral é:
 
 $$
-\frac{\partial u}{\partial t} - \alpha \frac{\partial^2 u}{\partial x^2} = 0 \quad \text{em} \quad \Omega \times [0, T]
+\frac{\partial u}{\partial t} = \alpha \frac{\partial^2 u}{\partial x^2} \quad \text{em} \quad \Omega \times [0, T]
 $$
 
 Onde:

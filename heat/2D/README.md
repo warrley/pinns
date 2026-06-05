@@ -7,7 +7,7 @@ Este diretório contém os experimentos da **Equação do Calor Bidimensional** 
 A propagação do calor em uma chapa (2 dimensões espaciais) é governada pela equação:
 
 $$
-\frac{\partial u}{\partial t} - \alpha \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right) = 0 \quad \text{em} \quad \Omega \times [0, T]
+\frac{\partial u}{\partial t} = \alpha \left( \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} \right) \quad \text{em} \quad \Omega \times [0, T]
 $$
 
 Onde $u(t, x, y)$ é a temperatura, e $\alpha$ é o coeficiente de difusividade térmica. A função de perda total geralmente segue o formato:
