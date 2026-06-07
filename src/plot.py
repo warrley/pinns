@@ -4,6 +4,84 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 
+def plot_vector_field(model, t_value, n=25, device=torch.device("cuda")):
+    model.eval()
+
+    x = torch.linspace(-1, 1, n, device=device)
+    y = torch.linspace(-1, 1, n, device=device)
+
+    X, Y = torch.meshgrid(x, y, indexing="ij")
+
+    x_test = X.reshape(-1,1)
+    y_test = Y.reshape(-1,1)
+
+    t_test = torch.full_like(x_test, t_value)
+
+    with torch.no_grad():
+        uv = model(t_test, x_test, y_test)
+
+    u = uv[:,0].reshape(n,n).cpu().numpy()
+    v = uv[:,1].reshape(n,n).cpu().numpy()
+
+    plt.figure(figsize=(8,8))
+
+    plt.quiver(
+        X.cpu().numpy(),
+        Y.cpu().numpy(),
+        u,
+        v
+    )
+
+    plt.xlabel("x")
+    plt.ylabel("y")
+    plt.title(f"Velocity field at t={t_value}")
+
+    plt.show()
+
+def plot_uv(model, t_value=0.5, device=torch.device("cuda")):
+    model.eval()
+    n=100
+
+    x = torch.linspace(-1, 1, n, device=device)
+    y = torch.linspace(-1, 1, n, device=device)
+
+    X, Y = torch.meshgrid(x, y, indexing="ij")
+
+    x_test = X.reshape(-1,1)
+    y_test = Y.reshape(-1,1)
+
+    t_test = torch.full_like(x_test, t_value)
+
+    with torch.no_grad():
+        uv = model(t_test, x_test, y_test)
+
+    u = uv[:,0].reshape(n,n).cpu().numpy()
+    v = uv[:,1].reshape(n,n).cpu().numpy()
+
+    fig, ax = plt.subplots(1, 2, figsize=(12,5))
+
+    c1 = ax[0].contourf(
+        X.cpu().numpy(),
+        Y.cpu().numpy(),
+        u,
+        levels=50
+    )
+
+    plt.colorbar(c1, ax=ax[0])
+    ax[0].set_title(f"u(x,y,t={t_value})")
+
+    c2 = ax[1].contourf(
+        X.cpu().numpy(),
+        Y.cpu().numpy(),
+        v,
+        levels=50
+    )
+
+    plt.colorbar(c2, ax=ax[1])
+    ax[1].set_title(f"v(x,y,t={t_value})")
+
+    plt.show()
+
 def plot_solution(model, nx=256, nt=100, filename=None):
     model.eval()
     device = next(model.parameters()).device
